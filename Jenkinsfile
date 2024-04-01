@@ -10,11 +10,17 @@ String SSH_ID_REF = 'ssh-credentials-id'
 pipeline{
     agent any
 
-    tools {
-        dockerTool 'docker'
-    }
+     tools {
+            maven 'Maven 3.8.1' // Sử dụng phiên bản Maven phù hợp
+            dockerTool 'docker'
+        }
 
     stages {
+        stage('Maven build'){
+            steps{
+                sh 'mvn clean package'
+            }
+        }
         stage('build and test'){
             steps{
                 sh 'docker --version'
@@ -34,7 +40,7 @@ pipeline{
             steps{
                 withBuildConfiguration {
                     sshagent(credentials: [SSH_ID_REF]) {
-                        sh 'ssh -o StrictHostKeyChecking=no root@ec2-18-143-167-76.ap-southeast-1.compute.amazonaws.com "docker run --detach --name lab2_dat -p 1612:8000 hoangdat1612/lab2_create_docker_image:latest"'
+                        sh 'ssh -o StrictHostKeyChecking=no root@ec2-18-143-167-76.ap-southeast-1.compute.amazonaws.com "docker run --detach --name test -p 1604:8000 hoangdat1612/test_tomcat:latest"'
                         // sh 'ssh root@ec2-18-143-167-76.ap-southeast-1.compute.amazonaws.com "docker run --detach --name lab2 -p 1612:8000 hoangdat1612/lab2_create_docker_image:latest"'
                     }
                 }
